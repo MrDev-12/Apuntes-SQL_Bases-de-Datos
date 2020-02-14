@@ -21,9 +21,9 @@ Estes apuntes se centran en el sublenguaje de **DQL** de SQL, el cual permite in
 
 **Estructura de una Sentencia SQL DQL**: 
 
- 1.- **FROM**: se indica la tabla/s de la cual se va a obtener los datos.
- 2.- **WHERE**: se indica una condición.
- 3.- **ORDER BY**, **GROUP BY**, **HAVING**, etc.
+ 1.- **FROM**: se indica la tabla/s de la cual se va a obtener los datos.  
+ 2.- **WHERE**: se indica una condición.  
+ 3.- **ORDER BY**, **GROUP BY**, **HAVING**, etc.  
  4.- **SELECT**: se indica los datos a mostrar.
 
 ***
@@ -35,7 +35,7 @@ Estes apuntes se centran en el sublenguaje de **DQL** de SQL, el cual permite in
 
 ### SELECT
 
-Permite seleccionar los datos que queramos de la base de datos.
+Permite seleccionar los datos que queramos de la base de datos.  
 Los datos devueltos son almacenados en una tabla de resultados.
 
 > **Ejemplos**:
@@ -85,7 +85,7 @@ FROM empleados;
 
 ### WHERE
 
-Se utiliza para filtrar los resultados obtenidos con el SELECT.
+Se utiliza para filtrar los resultados obtenidos con el SELECT.  
 Hace uso de condiciones para filtrar lo que se desee.
 
 > **Ejemplos**:
@@ -141,7 +141,7 @@ WHERE NOT continent = 'Africa';
 
 ### AS
 
-Sirve para ponerle un alias a una columna.
+Sirve para ponerle un alias a una columna.  
 Se suele utilizar para identificar de manera más fácil el tipo de datos que contine la columna.
 
 > **Ejemplo**:
@@ -156,7 +156,7 @@ WHERE horas > 5;
 
 ### IN
 
-Sirve para especificar multiples valores.
+Sirve para especificar multiples valores.  
 Es un operador que permite evitar el uso de **multiples OR**.
 
 > **Ejemplo**:
@@ -171,7 +171,7 @@ WHERE continent IN ('Africa', 'Europa', 'Asia');
 
 ### BETWEEN
 
-Sirve para seleccionar valores entre un rango definido.
+Sirve para seleccionar valores entre un rango definido.  
 El rango de valores incluye los definidos en la condición.
 
 > **Ejemplo**:
@@ -186,7 +186,7 @@ WHERE population BETWEEN 1000 AND 2000;
 
 ### LIKE
 
-Sirve para filtrar los datos que cumplen un patron predeterminado.
+Sirve para filtrar los datos que cumplen un patron predeterminado.  
 Hay dos signos que se utilizan con el LIKE:
 
 - **%**: representa cero, uno o múltiples caracteres.
@@ -267,7 +267,7 @@ WHERE name = CONCAT(name, ' City');
 
 Sirve para remplazar unos caracteres por otros.
 
-- **Sintaxis**: (Campo, 'Caracter a reemplazar', 'Caracter por el que remplazar')
+- **Sintaxis**: (Campo, *'Caracter a reemplazar'*, *'Caracter por el que remplazar'*)
 
 > **Ejemplo**:
 
@@ -366,7 +366,7 @@ FROM world;
 
 ### GROUP BY
 
-Sirve para agrupar varias filas que tienen el mismo valor en una única fila.
+Sirve para agrupar varias filas que tienen el mismo valor en una única fila.  
 Se suele utilizar con **funciones de agregado** como **COUNT**, **MAX**, **MIN**, **SUM** o **AVG**.
 
 > **Ejemplos**:
@@ -387,7 +387,7 @@ GROUP BY name;
 
 ### HAVING
 
-Permite utilizar **funciones de agregado**, cosa que el WHERE no permite.
+Permite utilizar **funciones de agregado**, cosa que el WHERE no permite.  
 Es necesario utilizar un **GROUP BY**.
 
 > **Ejemplos**:
@@ -413,8 +413,8 @@ ORDER BY name DESC;
 
 ### JOIN
 
-Sirve para combinar filas de dos o más tablas basándose en una columna común entre ellas.
-Para distinguir mejor a que tabla pertenecen, utilizaremos la siguiente nomenclatura: ***tabla.atributo***
+Sirve para combinar filas de dos o más tablas basándose en una columna común entre ellas.  
+Para distinguir mejor a que tabla pertenecen, utilizaremos la siguiente nomenclatura: ***tabla.atributo***  
 Hay diferentes tipos de JOINs:
 
 - **(INNER) JOIN**: devuelve los resultados que cumplan la condición en ambas tablas.
@@ -503,8 +503,78 @@ FROM teacher;
 
 ## Ejemplos Consultas Complejas
 
+Se pueden realizar subconsultas dentro de una consulta, es decir, **realizar SELECTs dentro de un WHERE**.  
+Sirve para comparar varios valores (***SELECT externo***) con un único resultado obtenido a través de una subcondición (***SELECT interno***).
 
-fulanito de menganito
+> **Ejemplos**:
 
-***
+*Muestra cada país donde la población sea mayor que la de Rusia*
+
+```SQL
+SELECT name
+FROM world
+WHERE population >
+      (SELECT population
+      FROM world
+      WHERE name = 'Russia');
+```
+
+*Muestra el país y continente de los países cuyo contiente sea el de Argentina o el de Australia*
+
+```SQL
+SELECT name, continent
+FROM world
+WHERE continent = 
+
+          (SELECT continent
+           FROM world
+           WHERE name = 'Argentina')
+
+OR continent = 
+
+          (SELECT continent
+           FROM world
+           WHERE name = 'Australia')
+           
+ORDER BY name;
+```
+
+A continuación, hay algunos ejemplos de las consultas más complejas en mi opinión, que son las que contienen **varios JOINs** o tienen **subconsultas con JOINs**.
+
+> **Ejemplos**:
+
+*Mostrar los actores que actuan en la película Casablanca*
+
+***Opción 1***:
+
+```SQL
+SELECT actor.name
+FROM actor JOIN casting ON actor.id = casting.actorid
+WHERE casting.movieid = (
+           SELECT movie.id
+           FROM movie
+           WHERE movie.title = 'Casablanca');
+```
+
+***Opción 2***:
+
+```SQL
+SELECT actor.name
+FROM actor JOIN casting ON actor.id = casting.actorid
+           JOIN movie ON casting.movieid = movie.id
+WHERE movie.title = 'Casablanca';
+```
+
+*Mostrar los actores que trabajaron con Art Garfunkel*
+
+```SQL
+SELECT actor.name                                             
+FROM actor JOIN casting ON actor.id = casting.actorid
+WHERE actor.name <> 'Art Garfunkel'
+      AND casting.movieid IN (
+                SELECT casting.movieid
+                FROM casting JOIN actor ON casting.actorid = actor.id
+                WHERE actor.name = 'Art Garfunkel');
+```
+
 ***
