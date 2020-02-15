@@ -400,6 +400,7 @@ FROM world
 GROUP BY continent
 HAVING COUNT(name) > 20;
 ```
+*Muestra los empleados que tengan una media de 5 o más en los trabajos entregados*
 
 ```SQL
 SELECT name, AVG(marks_jobs) AS 'Media Trabajos Entregados'
